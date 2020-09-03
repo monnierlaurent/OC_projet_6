@@ -2,15 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
-
-
-
-/*const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minutes
-    max: 5, // limiter chaque UP à 100 requêtes par fenêtre
-    message: "pauvre con"
-});*/
-
+const helmet = require("helmet");
 
 const userRoutes = require('./routes/user');
 
@@ -27,6 +19,17 @@ mongoose.connect('mongodb+srv://leane140304:leane140304@cluster0.qqzlu.mongodb.n
 
 const app = express();
 
+app.use(helmet.contentSecurityPolicy()); // permet d'atténuer les attaques de scripts intersites
+app.use(helmet.dnsPrefetchControl()); // permet d'atténuer les certificats SSL mal émis
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.hsts()); //indique aux navigateurs de préférer HTTPS à HTTP non sécurisé
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff()); // Cela atténue le reniflement de type MIME qui peut entraîner des failles de sécurité
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
+app.use(helmet.xssFilter());
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
