@@ -1,12 +1,6 @@
 const http = require('http');
-//const https = require('https');
-const app = require('./app');
-const fs = require('fs');
 
-/*const options = {
-    key: fs.readFileSync('ma_cle.key'),
-    cert: fs.readFileSync('mon_certicficat.cer')
-};*/
+const app = require('./app');
 
 const normalizePort = val => {
     const port = parseInt(val, 10);

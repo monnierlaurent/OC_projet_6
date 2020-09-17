@@ -8,7 +8,7 @@ const userRoutes = require('./routes/user');
 
 const sauceRoutes = require('./routes/sauce');
 
-const apiLimiter = require('./middleware/rateLimit');
+//const apiLimiter = require('./middleware/rateLimit');
 
 mongoose.connect('mongodb+srv://leane140304:leane140304@cluster0.qqzlu.mongodb.net/leane140304?retryWrites=true&w=majority', {
         useNewUrlParser: true,
@@ -19,17 +19,7 @@ mongoose.connect('mongodb+srv://leane140304:leane140304@cluster0.qqzlu.mongodb.n
 
 const app = express();
 
-app.use(helmet.contentSecurityPolicy()); // permet d'atténuer les attaques de scripts intersites
-app.use(helmet.dnsPrefetchControl()); // permet d'atténuer les certificats SSL mal émis
-app.use(helmet.expectCt());
-app.use(helmet.frameguard());
-app.use(helmet.hidePoweredBy());
-app.use(helmet.hsts()); //indique aux navigateurs de préférer HTTPS à HTTP non sécurisé
-app.use(helmet.ieNoOpen());
-app.use(helmet.noSniff()); // Cela atténue le reniflement de type MIME qui peut entraîner des failles de sécurité
-app.use(helmet.permittedCrossDomainPolicies());
-app.use(helmet.referrerPolicy());
-app.use(helmet.xssFilter());
+app.use(helmet());
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -41,9 +31,11 @@ app.use((req, res, next) => {
 app.use(bodyParser.json());
 
 
-app.use('/api/auth', apiLimiter, userRoutes);
+app.use('/api/auth', userRoutes);
+//app.use('/api/auth', apiLimiter, userRoutes);
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/api/sauces', sauceRoutes);
+
 
 
 module.exports = app;
