@@ -66,57 +66,65 @@ exports.likeSauce = (req, res, next) => {
 
 
 exports.updateSauce = (req, res, next) => {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, 'eyJhbGciOiJIUzI1NiIs@InR5cCI6IkpXVCJ9.eyJz#dWIiOiIxMjM0NTY3ODkwIiw/ibmFtZSI6IkpvaG4g&RG9lIiwiYWRtaW4iOnRydWV9.TJVA95Or/M7E2cBab30RM@HrHDcEfxjoYZgeFONFh7HgQ');
+    const userId = decodedToken.userId;
 
 
-    //---------
+    Sauce.findOne({ _id: req.params.id })
+        .then(sauce => {
+            if (sauce.userId === userId) {
+                const sauceObject = req.file ?
 
-    const sauceObject = req.file ?
+                    {...JSON.parse(req.body.sauce),
+                        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+                    } : {...req.body };
 
-        {...JSON.parse(req.body.sauce),
-            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-        } : {...req.body };
+                if (req.file) {
+                    Sauce.findOne({ _id: req.params.id })
+                        .then(sauce => {
+                            const filename = sauce.imageUrl.split('/images/')[1];
+                            fs.unlink(`images/${filename}`, () => {
+                                Sauce.updateOne({ _id: req.params.id }, {...sauceObject, _id: req.params.id })
+                                    .then(() => { res.status(201).json({ message: 'Sauce mise à jour!' }); })
+                                    .catch((error) => { res.status(400).json({ error }); });
+                            })
+                        })
+                        .catch((error) => { res.status(500).json({ error: error }) });
 
-    if (req.file) {
-        Sauce.findOne({ _id: req.params.id })
-            .then(sauce => {
-                const filename = sauce.imageUrl.split('/images/')[1];
-                fs.unlink(`images/${filename}`, () => {
+                } else {
                     Sauce.updateOne({ _id: req.params.id }, {...sauceObject, _id: req.params.id })
-                        .then(() => { res.status(201).json({ message: 'Sauce mise à jour!' }); })
-                        .catch((error) => { res.status(400).json({ error: error }); });
-                })
-            })
-            .catch((error) => { res.status(500).json({ error: error }); });
-
-    } else {
-        Sauce.updateOne({ _id: req.params.id }, {...sauceObject, _id: req.params.id })
-            .then(() => res.status(200).json({ message: 'Sauce modifié !' }))
-            .catch(error => res.status(400).json({ error }));
-    };
-
-    //---------
-
-
+                        .then(() => res.status(200).json({ message: 'Sauce modifié !' }))
+                        .catch(error => res.status(400).json({ error }));
+                };
+            } else {
+                res.status(403).json({ message: 'Vous ne pouvez pas  modifié cette sauce !' });
+            } //fin de if
+        }).catch((error) => { res.status(500).json({ error: error }); });
 
 };
 
 exports.deleteSauce = (req, res, next) => {
-
-    //-------------
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, 'eyJhbGciOiJIUzI1NiIs@InR5cCI6IkpXVCJ9.eyJz#dWIiOiIxMjM0NTY3ODkwIiw/ibmFtZSI6IkpvaG4g&RG9lIiwiYWRtaW4iOnRydWV9.TJVA95Or/M7E2cBab30RM@HrHDcEfxjoYZgeFONFh7HgQ');
+    const userId = decodedToken.userId;
 
     Sauce.findOne({ _id: req.params.id })
         .then(sauce => {
-            const filename = sauce.imageUrl.split('/images/')[1];
-            fs.unlink(`images/${filename}`, () => {
-                Sauce.deleteOne({ _id: req.params.id })
-                    .then(() => res.status(200).json({ message: 'Sauce supprimé !' }))
-                    .catch((error) => res.status(400).json({ error }));
-            });
+
+            if (sauce.userId === userId) {
+                const filename = sauce.imageUrl.split('/images/')[1];
+                fs.unlink(`images/${filename}`, () => {
+                    Sauce.deleteOne({ _id: req.params.id })
+                        .then(() => res.status(200).json({ message: 'Sauce supprimé !' }))
+                        .catch((error) => res.status(400).json({ error }));
+                });
+            } else {
+                res.status(403).json({ message: 'vous ne pouvez pas supprimé cette sauce !' })
+            };
+
         })
         .catch((error) => res.status(500).json({ error }));
-
-    //-------------
-
 
 };
 
