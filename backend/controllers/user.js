@@ -1,16 +1,42 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const mask = require('mask-email-phone');
+const crypto = require('crypto');
 
 const User = require('../models/user');
-const user = require('../models/user');
 
+
+const emailRegex = /^[a-zA-Z1-9-._]+?@{1}[a-zA-Z1-9.-_]+[.]{1}[a-zA-Z1-9]{2,10}$/;
+const passewordRegex = /^[a-zA-Z0-9]{4,8}$/;
 
 exports.createUser = (req, res, next) => {
+    const email = req.body.email;
+    const password = req.body.password
 
-    bcrypt.hash(req.body.password, 10)
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ 'error': 'Format email invalide !!!' });
+    }
+    if (!passewordRegex.test(password)) {
+        return res.status(400).json({ 'error': 'Format du mot de passe invalide !!!' });
+    }
+
+    // crypter email dans email:
+
+    const hashEmail = crypto.createHmac('sha256', 'abcdefg')
+        .update(req.body.email)
+        .digest('hex');
+    console.log(hashEmail);
+
+
+    // masquer email dans emailMask:
+    const input = req.body.email;
+    const output = mask(input);
+
+    bcrypt.hash(password, 10) // hasher le password avec bcrypt
         .then(hash => {
             const user = new User({
-                email: req.body.email,
+                emailMask: output,
+                email: hashEmail,
                 password: hash
             });
             user.save()
@@ -23,7 +49,14 @@ exports.createUser = (req, res, next) => {
 
 
 exports.loginUser = (req, res, next) => {
-    User.findOne({ email: req.body.email })
+
+
+    const hashEmail2 = crypto.createHmac('sha256', 'abcdefg')
+        .update(req.body.email)
+        .digest('hex');
+    console.log(hashEmail2);
+
+    User.findOne({ email: hashEmail2 })
         .then(user => {
             if (!User) {
                 return res.status(401).json({ error: 'utilsateur non inscrit' });
