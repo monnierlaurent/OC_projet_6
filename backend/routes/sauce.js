@@ -1,4 +1,5 @@
 const express = require('express');
+const routeValidator = require('express-route-validator');
 
 const router = express.Router();
 
@@ -7,16 +8,12 @@ const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
 
 
-
-
-
 router.post('/', auth, multer, userCtrl.createSauce);
 router.put('/:id', auth, multer, userCtrl.updateSauce);
 router.delete('/:id', auth, userCtrl.deleteSauce);
 router.get('/:id', auth, userCtrl.displayIdSauce);
 router.get('/', auth, userCtrl.displaySauce);
 router.post('/:id/like', auth, userCtrl.likeSauce);
-
 
 
 
