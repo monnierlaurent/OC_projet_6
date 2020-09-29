@@ -11,7 +11,7 @@ const sauceRoutes = require('./routes/sauce');
 
 //const apiLimiter = require('./middleware/rateLimit');
 
-mongoose.connect('mongodb+srv://leane140304:leane140304@cluster0.qqzlu.mongodb.net/leane140304?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://admin1:moi@cluster0.qqzlu.mongodb.net/leane140304?retryWrites=true&w=majority', {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })

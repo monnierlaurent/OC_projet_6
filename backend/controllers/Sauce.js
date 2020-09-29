@@ -81,9 +81,9 @@ exports.updateSauce = (req, res, next) => {
     const decodedToken = jwt.verify(token, 'eyJhbGciOiJIUzI1NiIs@InR5cCI6IkpXVCJ9.eyJz#dWIiOiIxMjM0NTY3ODkwIiw/ibmFtZSI6IkpvaG4g&RG9lIiwiYWRtaW4iOnRydWV9.TJVA95Or/M7E2cBab30RM@HrHDcEfxjoYZgeFONFh7HgQ');
     const userId = decodedToken.userId;
 
-    if (!sauceRegex.test(req.body.name) || !sauceRegex.test(req.body.manufacturer) || !descriptionRegex.test(req.body.description) || !sauceRegex.test(req.body.mainPepper) || !heatRegex.test(req.body.heat)) {
+    /*if (!sauceRegex.test(req.body.name), !sauceRegex.test(req.body.manufacturer), !descriptionRegex.test(req.body.description), !sauceRegex.test(req.body.mainPepper), !heatRegex.test(req.body.heat)) {
         return res.status(400).json({ 'error': 'Format des champs invalide !!!' });
-    };
+    };*/
 
     Sauce.findOne({ _id: req.params.id })
         .then(sauce => {
