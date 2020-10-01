@@ -1,29 +1,19 @@
-const Sauce = require('../models/sauce');
 const fs = require('fs');
-
-
-
+const Sauce = require('../models/sauce');
 
 
 exports.createSauce = (req, res, next) => {
-
     const sauceObject = JSON.parse(req.body.sauce);
     delete sauceObject._id;
-
-    /*if () {
-        return res.status(400).json({ 'error': 'Format des champs invalide !!!' });
-    };*/
-
-
     const sauce = new Sauce({
         ...sauceObject,
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
 
     });
-
     sauce.save()
         .then(() => res.status(201).json({ message: 'Sauce enregistrée !' }))
-        .catch(() => res.status(400).json({ error: 'code erreur 400' }));
+        .catch(error => res.status(400).json({ error }));
+
 };
 
 exports.likeSauce = (req, res, next) => {
@@ -74,15 +64,21 @@ exports.likeSauce = (req, res, next) => {
 
 exports.updateSauce = (req, res, next) => {
 
+
+
+
+
+
+
     Sauce.findOne({ _id: req.params.id })
         .then(sauce => {
+
             if (sauce.userId === req.userIdAuth) {
                 const sauceObject = req.file ?
 
                     {...JSON.parse(req.body.sauce),
                         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
                     } : {...req.body };
-
                 if (req.file) {
                     Sauce.findOne({ _id: req.params.id })
                         .then(sauce => {
@@ -91,9 +87,10 @@ exports.updateSauce = (req, res, next) => {
                                 Sauce.updateOne({ _id: req.params.id }, {...sauceObject, _id: req.params.id })
                                     .then(() => { res.status(201).json({ message: 'Sauce mise à jour!' }); })
                                     .catch(() => {
-                                        res.status(400).json({ error: 'code erreur 400' });
+                                        const filename = sauce.imageUrl.split('/images/')[1];
+                                        fs.unlink(`images/${filename}`), res.status(400).json({ error: 'code erreur 400' });
                                     });
-                            })
+                            });
                         })
                         .catch(() => { res.status(500).json({ error: 'code erreur 500' }) });
 
@@ -104,7 +101,8 @@ exports.updateSauce = (req, res, next) => {
                 };
             } else {
                 res.status(403).json({ error: 'code erreur 403' });
-            }
+            };
+
         }).catch();
 
 };
@@ -153,3 +151,15 @@ exports.displayIdSauce = (req, res, next) => {
     .then(sauces => res.status(200).json(sauces))
         .catch(() => res.status(404).json({ error: 'code erreur 404' }));
 };
+
+
+
+/*manufacturer: Joi.string()
+
+            .required(),
+        description: Joi.string()
+
+            .required(),
+        mainPepper: Joi.string()
+
+            .required(),*/

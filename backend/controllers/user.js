@@ -6,7 +6,7 @@ const passwordValidator = require("password-validator");
 const emailValidator = require("email-validator");
 
 const User = require('../models/user');
-const { userInfo } = require('os');
+
 
 
 
@@ -28,27 +28,22 @@ exports.createUser = (req, res, next) => {
 
 
     if (schema.validate(req.body.password)) {
-        const email = req.body.email;
-        const password = req.body.password
 
-
-        // chiffrage email dans email
+        // chiffrage email 
 
         const hashEmail = crypto.createHmac('sha256', 'abcdefg')
             .update(req.body.email)
             .digest('hex');
 
-
-
         // masquage email dans emailMask:
         const input = req.body.email;
-        const output = mask(input);
+        const emailMask = mask(input);
 
-        bcrypt.hash(password, 10) // hasher le password avec bcrypt
+        bcrypt.hash(req.body.password, 10) // hasher le password avec bcrypt
             .then(hash => {
                 const user = new User({
                     emailMask: output,
-                    email: hashEmail,
+                    email: emailMask,
                     password: hash
                 });
                 user.save()
