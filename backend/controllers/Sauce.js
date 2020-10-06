@@ -5,18 +5,27 @@ const Sauce = require('../models/sauce');
 exports.createSauce = (req, res, next) => {
 
 
+
     const sauceObject = JSON.parse(req.body.sauce);
+
     delete sauceObject._id;
+
     const sauce = new Sauce({
         ...sauceObject,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
 
     });
+
+
     sauce.save()
         .then(() => res.status(201).json({ message: 'Sauce enregistrée !' }))
-        .catch(error => res.status(400).json({ error }));
+        .catch(() => {
+            const filename = sauce.imageUrl.split("/images")[1];
+            fs.unlink(`images/${filename}`, () => { res.status(400).json({ error: 'code erreur 400' }) });
+        });
 
 };
+
 
 exports.likeSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
@@ -77,6 +86,8 @@ exports.likeSauce = (req, res, next) => {
 
 
 exports.updateSauce = (req, res, next) => {
+
+
     Sauce.findOne({ _id: req.params.id })
         .then(sauce => {
 
@@ -102,13 +113,15 @@ exports.updateSauce = (req, res, next) => {
                 } else {
                     Sauce.updateOne({ _id: req.params.id }, {...sauceObject, _id: req.params.id })
                         .then(() => res.status(200).json({ message: 'Sauce modifié !' }))
-                        .catch();
+                        .catch(() => { return res.status(400).json({ error: 'code erreur 400 , la sauce n\'est pas modifiée' }) });
                 };
+
+
 
             } else {
                 res.status(403).json({ error: 'code erreur 403' });
             };
-        }).catch();
+        }).catch(() => { return res.status(400).json({ error: 'code erreur 400 , la sauce n\'est pas modifiée' }) });
 };
 
 exports.deleteSauce = (req, res, next) => {
@@ -143,7 +156,6 @@ exports.displayIdSauce = (req, res, next) => {
     if (!req.params.id) {
         res.status(404).json({ error: 'Id de la sauce et invalide' });
     };
-
     Sauce.findOne({ _id: req.params.id })
 
     .then(sauces => res.status(200).json(sauces))

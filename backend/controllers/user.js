@@ -42,8 +42,8 @@ exports.createUser = (req, res, next) => {
         bcrypt.hash(req.body.password, 10) // hasher le password avec bcrypt
             .then(hash => {
                 const user = new User({
-                    emailMask: output,
-                    email: emailMask,
+                    emailMask: emailMask,
+                    email: hashEmail,
                     password: hash
                 });
                 user.save()
@@ -51,7 +51,7 @@ exports.createUser = (req, res, next) => {
                         res.status(201).json({ message: 'utilisateur enregistré !!' });
                     }).catch(error => res.status(400).json({ error }));
             })
-            .catch(error => res.status(500).json({ error }));
+            .catch(error => res.status(500).json({ error: 'merde' }));
     } else {
         res.status(201).json({ message: 'Le mot de passe doit comporter entre 4 et 8 caratheres maximum ,1 majuscule , 1 chiffre' })
     };
@@ -62,13 +62,12 @@ exports.createUser = (req, res, next) => {
 
 exports.loginUser = (req, res, next) => {
 
-    //const id = user._id;
-    //console.log(id);
+
     const hashEmail2 = crypto.createHmac('sha256', 'abcdefg')
         .update(req.body.email)
         .digest('hex');
 
-
+    console.lo
     User.findOne({ email: hashEmail2 })
         .then(user => {
 

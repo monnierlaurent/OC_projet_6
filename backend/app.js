@@ -9,9 +9,9 @@ const userRoutes = require('./routes/user');
 const sauceRoutes = require('./routes/sauce');
 
 
-//const apiLimiter = require('./middleware/rateLimit');
+const apiLimiter = require('./middleware/rateLimit');
 
-mongoose.connect('mongodb+srv://admin1:moi@cluster0.qqzlu.mongodb.net/leane140304?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://admin0:moi@cluster0.qqzlu.mongodb.net/SoPekocko?retryWrites=true&w=majority', {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
@@ -31,9 +31,10 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
-//app.use('/api/auth', apiLimiter, userRoutes);
+
+app.use('/api/auth', apiLimiter, userRoutes);
+
 app.use('/api/sauces', sauceRoutes);
-app.use('/api/auth', userRoutes);
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 
