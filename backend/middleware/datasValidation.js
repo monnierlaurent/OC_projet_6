@@ -2,8 +2,11 @@ const schema = require('../models/schemaValidion');
 
 module.exports = async(req, res, next) => {
     try {
-        const valuename = await schema.validateAsync({ name: req.body.name });
-        const valuemanufacturer = await schema.validateAsync({ name: req.body.manufacturer });
+        console.log(req.body);
+        const reqResult = req.file ? JSON.parse(req.body.sauce) : req.body;
+
+        const valuename = await schema.validateAsync({ name: reqResult.name });
+        const valuemanufacturer = await schema.validateAsync({ name: reqResult.manufacturer });
 
         if (valuename.error, valuemanufacturer.error) {
             return res.json({ error: 'value.error.details[0].message' });
@@ -11,8 +14,8 @@ module.exports = async(req, res, next) => {
             next();
         };
     } catch {
-        res.status(400).json({
-            message: 'tous est cramé !!!'
+        res.status(404).json({
+            message: 'les champs ne sont pas conformes !'
         })
     }
 };

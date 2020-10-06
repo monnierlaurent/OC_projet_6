@@ -10,7 +10,7 @@ const SauceValidation = require('../middleware/datasValidation');
 
 
 router.post('/', auth, multer, userCtrl.createSauce);
-router.put('/:id', auth, SauceValidation, multer, userCtrl.updateSauce);
+router.put('/:id', auth, multer, SauceValidation, userCtrl.updateSauce);
 router.delete('/:id', auth, userCtrl.deleteSauce);
 router.get('/:id', auth, userCtrl.displayIdSauce);
 router.get('/', auth, userCtrl.displaySauce);
