@@ -43,7 +43,7 @@ exports.createUser = (req, res, next) => {
                     password: hash
                 });
 
-                // methode save() pour enregistrement deans la BDD
+                // methode save() pour enregistrement dans la BDD
                 user.save()
                     .then(() => {
                         res.status(201).json({ message: 'Utilisateur enregistré !' });
