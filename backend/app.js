@@ -1,16 +1,15 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+const bodyParser = require('body-parser'); //convertir  le corps des requêtes en objet JSON
+const mongoose = require('mongoose'); //package pour les interactions avec BDD
+const helmet = require('helmet'); //aide à sécuriser l'api en définissant divers en-têtes
 const path = require('path');
-const helmet = require('helmet');
-
 
 const userRoutes = require('./routes/user');
 const sauceRoutes = require('./routes/sauce');
 
 
-const apiLimiter = require('./middleware/rateLimit');
 
+// connection a la BDD mongoDB ATLAS
 mongoose.connect('mongodb+srv://admin0:moi@cluster0.qqzlu.mongodb.net/SoPekocko?retryWrites=true&w=majority', {
         useNewUrlParser: true,
         useUnifiedTopology: true
@@ -22,24 +21,29 @@ const app = express();
 
 app.use(helmet());
 
+// middleware qui sera appliqué toutes les routes et pour tous les requêtes
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Origin', '*'); // pour que tous le monde puisse utiliser l'api
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization'); //autorisation pour utiliser certaine entetes sur les req
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS'); // autorise les methodes GET, POST, PUT, DELETE, PATCH, OPTIONS
     next();
 });
 
+// sert a convertir  le corps des requêtes en objet JSON
 app.use(bodyParser.json());
 
+//middelware pour donné la base des routes pour l'enregistrement et autentification des utilisateurs
+app.use('/api/auth', userRoutes);
 
-app.use('/api/auth', apiLimiter, userRoutes);
-
+//middelware pour donné la base des routes les manipulation sur les sauces
 app.use('/api/sauces', sauceRoutes);
+
+//middelware pour la gestion des fichiers images des sauces
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 
 app.use('*', (req, res) => {
-    res.status(400).json({ error: 'code erreur 404' });
+    res.status(400).json({ error: 'La syntaxe de la requête est erronée' });
 });
 
 

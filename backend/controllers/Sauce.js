@@ -93,30 +93,44 @@ exports.updateSauce = (req, res, next) => {
         .then(sauce => {
 
             if (sauce.userId === req.userIdAuth) {
+
                 const sauceObject = req.file ? {...JSON.parse(req.body.sauce),
                     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
                 } : {...req.body };
 
+
+
                 if (req.file) {
                     Sauce.findOne({ _id: req.params.id })
                         .then(sauce => {
+                            console.log(sauce);
+
                             const filename = sauce.imageUrl.split('/images/')[1];
+
+                            console.log(filename);
                             fs.unlink(`images/${filename}`, () => {
                                 Sauce.updateOne({ _id: req.params.id }, {...sauceObject, _id: req.params.id })
                                     .then(() => { res.status(201).json({ message: 'Sauce mise à jour!' }); })
                                     .catch(() => {
-                                        const filename = sauce.imageUrl.split('/images/')[1];
-                                        fs.unlink(`images/${filename}`), res.status(400).json({ error: 'La syntaxe de la requête est erronée' });
+                                        res.status(400).json({ error: 'La syntaxe de la requête est erronée' });
                                     });
                             });
                         })
-                        .catch(() => { res.status(400).json({ error: 'code erreur 400' }) });
+                        .catch(() => {
+
+                            res.status(400).json({ error: 'La syntaxe de la requête est erronée' })
+                        });
                 } else {
+
                     Sauce.updateOne({ _id: req.params.id }, {...sauceObject, _id: req.params.id })
-                        .then(() => res.status(200).json({ message: 'Sauce modifié !' }))
-                        .catch(() => { return res.status(400).json({ error: 'La syntaxe de la requête est erronée' }) });
+                        .then(() => res.status(200).json({ message: 'Sauce non modifié !' }))
+                        .catch(() => {
+                            res.status(400).json({ error: 'La syntaxe de la requête est erronée' })
+                        });
+
                 };
             } else {
+
                 res.status(403).json({ error: 'Modification impossible ,vous n\'êtes pas sont créateur !' });
             };
         }).catch(() => { return res.status(400).json({ error: 'La syntaxe de la requête est erronée' }) });
