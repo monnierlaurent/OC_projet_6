@@ -20,19 +20,19 @@ exports.createUser = (req, res, next) => {
         return res.status(400).json({ error: 'L\'email ou le mot de passe est invalide !!!' });
     };
 
-    //controle de la conformitée du mot de passe 
+    //controle de la conformitée du mot de passe OWASP limiter le piratage de session
     if (schemaPassword.validate(req.body.password)) {
 
-        // chiffrage email , pour la protections des données(RGPD)
+        // chiffrage email , pour la protections des données(RGPD) et (OWASP Exposition de données sensibles)
         const hashEmail = crypto.createHmac('sha256', '@le&Petit%Chat#BoitDu&Laid%De#Poule&Tous%Les#Noel')
             .update(req.body.email)
             .digest('hex');
 
-        // masquage email pour la protections des données(RGPD)
+        // masquage email pour la protections des données(RGPD) et (OWASP Exposition de données sensibles)
         const input = req.body.email;
         const emailMask = mask(input);
 
-        // hasher le password avec bcrypt et sa function HASH, pour la protections des données(RGPD)
+        // hasher le password avec bcrypt et sa function HASH, pour la protections des données(RGPD) et (OWASP Exposition de données sensibles)
         bcrypt.hash(req.body.password, 10)
             .then(hash => {
 
@@ -89,7 +89,7 @@ exports.loginUser = (req, res, next) => {
                     };
 
                     res.status(200).json({
-                        // envoi d'une response avec le token d'authentification
+                        // envoi d'une response avec le token d'authentification et (OWASP évite le piratage de session)
                         userId: user._id,
                         token: jwt.sign({ userId: user._id },
                             'eyJhbGciOiJIUzI1NiIs@InR5cCI6IkpXVCJ9.eyJz#dWIiOiIxMjM0NTY3ODkwIiw/ibmFtZSI6IkpvaG4g&RG9lIiwiYWRtaW4iOnRydWV9.TJVA95Or/M7E2cBab30RM@HrHDcEfxjoYZgeFONFh7HgQ', { expiresIn: '24h' },
