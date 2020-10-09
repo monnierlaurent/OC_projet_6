@@ -9,7 +9,7 @@ const SauceValidation = require('../middleware/datasValidation');
 //CRUD
 
 // router pour la creation d'une sauce
-router.post('/', auth, multer, userCtrl.createSauce);
+router.post('/', auth, multer, SauceValidation, userCtrl.createSauce);
 
 // router pour la modification d'une sauce
 router.put('/:id', auth, multer, SauceValidation, userCtrl.updateSauce);
