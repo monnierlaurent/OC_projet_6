@@ -21,6 +21,7 @@
         "joi": "^17.2.1",
         "jsonwebtoken": "^8.5.1",
         "mask-email-phone": "^1.0.2",
+        "mongo-sanitize": "^1.1.0",
         "mongoose": "^5.10.0",
         "mongoose-unique-validator": "^2.0.3",
         "multer": "^1.4.2",

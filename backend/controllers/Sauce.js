@@ -1,4 +1,6 @@
 const fs = require('fs');
+const sanitize = require('mongo-sanitize');
+
 const Sauce = require('../models/sauce');
 
 // enregistrement d'une sauce
@@ -8,8 +10,10 @@ exports.createSauce = (req, res, next) => {
     if (req.body.sauce === undefined) {
         return res.status(400).json({ error: 'La syntaxe de la requête est erronée !' });
     };
+    //
+    const sauceClean = sanitize(req.body.sauce);
     // convertion du corp de la requête et stockage du JSON dans la constante
-    const sauceObject = JSON.parse(req.body.sauce);
+    const sauceObject = JSON.parse(sauceClean);
 
     //suppression de l'_id de la sauce. un nouvel id sera creé par mongoDB
     delete sauceObject._id;
@@ -25,7 +29,6 @@ exports.createSauce = (req, res, next) => {
     sauce.save()
         .then(() => res.status(201).json({ message: 'Sauce enregistrée !' }))
         .catch(() => {
-
             const filename = sauce.imageUrl.split("/images")[1];
             fs.unlink(`images/${filename}`, () => { res.status(400).json({ error: 'La syntaxe de la requête est erronée' }) });
         });
@@ -108,12 +111,13 @@ exports.updateSauce = (req, res, next) => {
                     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
                 } : {...req.body };
 
-
                 //si un fichier et présent 
                 if (req.file) {
+
                     // methode findOne() pour récupérer dans la BDD la sauce par son id
                     Sauce.findOne({ _id: req.params.id })
                         .then(sauce => {
+
                             // recuperation de l'anciens fichiers rattaché a la sauce 
                             const filename = sauce.imageUrl.split('/images/')[1];
 
@@ -126,7 +130,6 @@ exports.updateSauce = (req, res, next) => {
                                         res.status(201).json({ message: 'Sauce mise à jour!' });
                                     })
                                     .catch(() => {
-
                                         res.status(400).json({ error: 'La syntaxe de la requête est erronée' });
                                     });
                             });
@@ -139,33 +142,27 @@ exports.updateSauce = (req, res, next) => {
                     // si pas de fichier present mise a jour uniquement avec le corp de la requête
                     Sauce.updateOne({ _id: req.params.id }, {...sauceObject, _id: req.params.id })
                         .then(() => {
-
-
                             res.status(200).json({ message: 'Sauce non modifié !', });
-
-
                         })
                         .catch(() => {
                             res.status(400).json({ error: 'La syntaxe de la requête est erronée' })
                         });
-
                 };
                 // response si l'utilisateur qui n'est pas le créateur veu modifier la sauce
             } else {
-
                 res.status(403).json({ error: 'Modification impossible ,vous n\'êtes pas sont créateur !' });
             };
         }).catch(() => {
-
-            return res.status(400).json({ error: 'La syntaxe de la requête est erronée' })
+            res.status(400).json({ error: 'La syntaxe de la requête est erronée' })
         });
 };
 
 
 
 exports.deleteSauce = (req, res, next) => {
+    const id = sanitize(req.params.id);
     // methode findOne() pour récupérer une sauce dans la BDD 
-    Sauce.findOne({ _id: req.params.id })
+    Sauce.findOne({ _id: id })
         .then(sauce => {
 
             if (sauce.userId === req.userIdAuth) {
@@ -175,7 +172,7 @@ exports.deleteSauce = (req, res, next) => {
                 fs.unlink(`images/${filename}`, () => {
 
                     // methode deleteOne() pour supprimer une sauce dans la BDD
-                    Sauce.deleteOne({ _id: req.params.id })
+                    Sauce.deleteOne({ _id: id })
                         .then(() => res.status(200).json({ message: 'Sauce supprimé !' }))
                         .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
                 });
@@ -198,12 +195,17 @@ exports.displaySauce = (req, res, next) => {
 };
 
 // récupération d'une saul  sauce par son _ID 
+
+
+
 exports.displayIdSauce = (req, res, next) => {
-    if (!req.params.id) {
+    const id = sanitize(req.params.id);
+    if (!id) {
         res.status(404).json({ error: 'cette sauce n\'existe pas !' });
     };
+
     // methode findOne() our récupération d'une seul sauce dans la BDD par son id
-    Sauce.findOne({ _id: req.params.id })
+    Sauce.findOne({ _id: id })
         .then(sauces => res.status(200).json(sauces))
         .catch(() => res.status(404).json({ error: 'cette sauce n\'existe pas !' }));
 };
