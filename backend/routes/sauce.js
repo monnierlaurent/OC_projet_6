@@ -15,7 +15,7 @@ router.post('/', auth, multer, SauceValidation, sauceCtrl.createSauce);
 router.put('/:id', auth, multer, SauceValidation, sauceCtrl.updateSauce);
 
 // router pour la suppression d'une sauce
-router.delete('/:id', auth, sauceCtrl.deleteSaucsauce);
+router.delete('/:id', auth, sauceCtrl.deleteSauce);
 // router pour la recupération d'une seul sauce par sont ID
 router.get('/:id', auth, sauceCtrl.displayIdSauce);
 
