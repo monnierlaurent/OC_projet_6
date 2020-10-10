@@ -46,7 +46,6 @@ exports.likeSauce = (req, res, next) => {
                 return res.status(400).json({ error: 'La syntaxe de la requête est erronée !' });
             };
 
-
             if (req.body.like === 1) {
                 if (sauce.usersLiked.includes(req.body.userId), sauce.usersDisliked.includes(req.body.userId)) {
                     Sauce.updateOne({ _id: req.params.id }, { likes: 0 }, { usersLiked: req.body.userId })

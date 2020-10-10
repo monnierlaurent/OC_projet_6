@@ -1,6 +1,6 @@
 const express = require('express');
-const bodyParser = require('body-parser'); //convertir  le corps des requêtes en objet JSON
-const mongoose = require('mongoose'); //package pour les interactions avec BDD
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 const helmet = require('helmet');
 const path = require('path');
 
@@ -10,7 +10,7 @@ const sauceRoutes = require('./routes/sauce');
 
 
 // connection a la BDD mongoDB ATLAS
-mongoose.connect('mongodb+srv://admin0:moi@cluster0.qqzlu.mongodb.net/SoPekocko?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://admin2:moi@cluster0.qqzlu.mongodb.net/SoPekocko?retryWrites=true&w=majority', {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
