@@ -10,6 +10,9 @@ exports.createSauce = (req, res, next) => {
     if (req.body.sauce === undefined) {
         return res.status(400).json({ error: 'La syntaxe de la requête est erronée !' });
     };
+    if (!req.file) {
+        return res.status(400).json({ error: 'La syntaxe de la requête est erronée !' });
+    }
     //
     const sauceClean = sanitize(req.body.sauce);
     // convertion du corp de la requête et stockage du JSON dans la constante
