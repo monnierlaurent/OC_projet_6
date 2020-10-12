@@ -11,7 +11,6 @@ module.exports = async(req, res, next) => {
         //console.log(req.file);
         // controle de chaque données du corps de la requête
         const valuename = await schema.validateAsync({ name: reqResult.name });
-
         const valuemanufacturer = await schema.validateAsync({ manufacturer: reqResult.manufacturer });
         const valueDescription = await schema.validateAsync({ description: reqResult.description });
         const valueMainPepper = await schema.validateAsync({ mainPepper: reqResult.mainPepper });

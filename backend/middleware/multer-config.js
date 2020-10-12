@@ -1,4 +1,3 @@
-const { diskStorage } = require('multer');
 const multer = require('multer'); // package de gestion de fichiers
 
 const MIME_TYPES = {

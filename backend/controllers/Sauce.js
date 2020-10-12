@@ -32,66 +32,27 @@ exports.createSauce = (req, res, next) => {
             const filename = sauce.imageUrl.split("/images")[1];
             fs.unlink(`images/${filename}`, () => { res.status(400).json({ error: 'La syntaxe de la requête est erronée' }) });
         });
-
 };
 
-// envoie des likes et dislikes
-exports.likeSauce = (req, res, next) => {
-    Sauce.findOne({ _id: req.params.id })
-        .then((sauce) => {
+// récupération de toute les sauces 
+exports.displaySauce = (req, res, next) => {
+    // methode find() pour récupération de toute les sauces  présente dans la BDD
+    Sauce.find()
+        .then(sauces => res.status(200).json(sauces))
+        .catch(() => res.status(404).json({ error: 'Sauces non trouvé' }));
+};
 
+// récupération d'une saul  sauce par son _ID 
+exports.displayIdSauce = (req, res, next) => {
+    const id = sanitize(req.params.id);
+    if (!id) {
+        res.status(404).json({ error: 'cette sauce n\'existe pas !' });
+    };
 
-            // vérification que la requête n'est pas vide
-            if (req.body.like === undefined, req.body.userId === undefined) {
-                return res.status(400).json({ error: 'La syntaxe de la requête est erronée !' });
-            };
-
-            if (req.body.like === 1) {
-                if (sauce.usersLiked.includes(req.body.userId), sauce.usersDisliked.includes(req.body.userId)) {
-                    Sauce.updateOne({ _id: req.params.id }, { likes: 0 }, { usersLiked: req.body.userId })
-                        .then(() => res.status(201).json({ message: 'Vous avez déja disliker !' }))
-                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
-                } else if (sauce.usersLiked.includes(req.body.userId)) {
-                    Sauce.updateOne({ _id: req.params.id }, { likes: 1 }, { usersLiked: req.body.userId })
-                        .then(() => res.status(201).json({ message: 'Vous avez déja liker !' }))
-                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
-                } else {
-                    Sauce.updateOne({ _id: req.params.id }, { $inc: { likes: 1 }, $addToSet: { usersLiked: req.body.userId } })
-                        .then(() => res.status(201).json({ message: 'like enregistré !' }))
-                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
-                };
-            };
-
-            if (req.body.like === -1) {
-                if (sauce.usersDisliked.includes(req.body.userId), sauce.usersLiked.includes(req.body.userId)) {
-                    Sauce.updateOne({ _id: req.params.id }, { dislikes: 0 }, { usersDisliked: req.body.userId })
-                        .then(() => res.status(201).json({ message: 'Vous avez déja liker !' }))
-                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
-                } else if (sauce.usersDisliked.includes(req.body.userId)) {
-                    Sauce.updateOne({ _id: req.params.id }, { dislikes: 1 }, { usersDisliked: req.body.userId })
-                        .then(() => res.status(201).json({ message: 'Vous avez déja disliker !' }))
-                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
-                } else {
-                    Sauce.updateOne({ _id: req.params.id }, { $inc: { dislikes: 1 }, $addToSet: { usersDisliked: req.body.userId } })
-                        .then(() => res.status(201).json({ message: 'Dislike enregistré !' }))
-                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
-                };
-            };
-
-            if (req.body.like === 0) {
-                if (sauce.usersLiked.includes(req.body.userId)) {
-                    Sauce.updateOne({ _id: req.params.id }, { $inc: { likes: req.body.like - 1 }, $pull: { usersLiked: req.body.userId } })
-                        .then(() => res.status(201).json({ message: 'Like supprimé !' }))
-                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
-                };
-                if (sauce.usersDisliked.includes(req.body.userId)) {
-                    Sauce.updateOne({ _id: req.params.id }, { $inc: { dislikes: req.body.like - 1 }, $pull: { usersDisliked: req.body.userId } })
-                        .then(() => res.status(201).json({ message: 'Dislike supprimé !' }))
-                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
-                };
-            };
-        })
-        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
+    // methode findOne() our récupération d'une seul sauce dans la BDD par son id
+    Sauce.findOne({ _id: id })
+        .then(sauces => res.status(200).json(sauces))
+        .catch(() => res.status(404).json({ error: 'cette sauce n\'existe pas !' }));
 };
 
 
@@ -156,6 +117,63 @@ exports.updateSauce = (req, res, next) => {
         });
 };
 
+// envoie des likes et dislikes
+exports.likeSauce = (req, res, next) => {
+    Sauce.findOne({ _id: req.params.id })
+        .then((sauce) => {
+
+            // vérification que la requête n'est pas vide
+            if (req.body.like === undefined, req.body.userId === undefined) {
+                return res.status(400).json({ error: 'La syntaxe de la requête est erronée !' });
+            };
+
+            if (req.body.like === 1) {
+                if (sauce.usersLiked.includes(req.body.userId), sauce.usersDisliked.includes(req.body.userId)) {
+                    Sauce.updateOne({ _id: req.params.id }, { likes: 0 }, { usersLiked: req.body.userId })
+                        .then(() => res.status(201).json({ message: 'Vous avez déja disliker !' }))
+                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
+                } else if (sauce.usersLiked.includes(req.body.userId)) {
+                    Sauce.updateOne({ _id: req.params.id }, { likes: 1 }, { usersLiked: req.body.userId })
+                        .then(() => res.status(201).json({ message: 'Vous avez déja liker !' }))
+                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
+                } else {
+                    Sauce.updateOne({ _id: req.params.id }, { $inc: { likes: 1 }, $addToSet: { usersLiked: req.body.userId } })
+                        .then(() => res.status(201).json({ message: 'like enregistré !' }))
+                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
+                };
+            };
+
+            if (req.body.like === -1) {
+                if (sauce.usersDisliked.includes(req.body.userId), sauce.usersLiked.includes(req.body.userId)) {
+                    Sauce.updateOne({ _id: req.params.id }, { dislikes: 0 }, { usersDisliked: req.body.userId })
+                        .then(() => res.status(201).json({ message: 'Vous avez déja liker !' }))
+                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
+                } else if (sauce.usersDisliked.includes(req.body.userId)) {
+                    Sauce.updateOne({ _id: req.params.id }, { dislikes: 1 }, { usersDisliked: req.body.userId })
+                        .then(() => res.status(201).json({ message: 'Vous avez déja disliker !' }))
+                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
+                } else {
+                    Sauce.updateOne({ _id: req.params.id }, { $inc: { dislikes: 1 }, $addToSet: { usersDisliked: req.body.userId } })
+                        .then(() => res.status(201).json({ message: 'Dislike enregistré !' }))
+                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
+                };
+            };
+
+            if (req.body.like === 0) {
+                if (sauce.usersLiked.includes(req.body.userId)) {
+                    Sauce.updateOne({ _id: req.params.id }, { $inc: { likes: req.body.like - 1 }, $pull: { usersLiked: req.body.userId } })
+                        .then(() => res.status(201).json({ message: 'Like supprimé !' }))
+                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
+                };
+                if (sauce.usersDisliked.includes(req.body.userId)) {
+                    Sauce.updateOne({ _id: req.params.id }, { $inc: { dislikes: req.body.like - 1 }, $pull: { usersDisliked: req.body.userId } })
+                        .then(() => res.status(201).json({ message: 'Dislike supprimé !' }))
+                        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
+                };
+            };
+        })
+        .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
+};
 
 
 exports.deleteSauce = (req, res, next) => {
@@ -183,28 +201,4 @@ exports.deleteSauce = (req, res, next) => {
         .catch(() => {
             res.status(500).json({ error: 'Erreur interne du serveur !' });
         });
-};
-
-// récupération de toute les sauces 
-exports.displaySauce = (req, res, next) => {
-    // methode find() pour récupération de toute les sauces  présente dans la BDD
-    Sauce.find()
-        .then(sauces => res.status(200).json(sauces))
-        .catch(() => res.status(404).json({ error: 'Sauces non trouvé' }));
-};
-
-// récupération d'une saul  sauce par son _ID 
-
-
-
-exports.displayIdSauce = (req, res, next) => {
-    const id = sanitize(req.params.id);
-    if (!id) {
-        res.status(404).json({ error: 'cette sauce n\'existe pas !' });
-    };
-
-    // methode findOne() our récupération d'une seul sauce dans la BDD par son id
-    Sauce.findOne({ _id: id })
-        .then(sauces => res.status(200).json(sauces))
-        .catch(() => res.status(404).json({ error: 'cette sauce n\'existe pas !' }));
 };
