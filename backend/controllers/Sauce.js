@@ -119,7 +119,6 @@ exports.updateSauce = (req, res, next) => {
             res.status(400).json({ error: 'La syntaxe de la requête est erronée' })
         });
 };
-
 // envoie des likes et dislikes
 exports.likeSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
@@ -186,6 +185,7 @@ exports.deleteSauce = (req, res, next) => {
         .then(sauce => {
 
             if (sauce.userId === req.userIdAuth) {
+                console.log(sauce.userId);
                 // recuperation du  fichiers rattaché a la sauce 
                 const filename = sauce.imageUrl.split('/images/')[1];
                 //suppression du fichier de la sauce avec le package fs et la function unlink
