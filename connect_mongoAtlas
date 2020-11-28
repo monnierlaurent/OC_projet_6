@@ -1,0 +1,4 @@
+DB_USERNAME = admin2
+DB_PASSWORD = moi
+
+Renommer ce fichier en .env et le placer à la racine du dossier backend.

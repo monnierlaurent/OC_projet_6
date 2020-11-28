@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -10,7 +11,7 @@ const sauceRoutes = require('./routes/sauce');
 
 
 // connection a la BDD mongoDB ATLAS
-mongoose.connect('mongodb+srv://admin2:moi@cluster0.qqzlu.mongodb.net/SoPekocko?retryWrites=true&w=majority', {
+mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.qqzlu.mongodb.net/SoPekocko?retryWrites=true&w=majority`, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })

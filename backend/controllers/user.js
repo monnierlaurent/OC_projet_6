@@ -51,7 +51,7 @@ exports.createUser = (req, res, next) => {
             })
             .catch(() => res.status(500).json({ error: 'Erreur interne du serveur' }));
     } else {
-        res.status(201).json({ message: 'Le mot de passe doit comporter entre 4 et 8 caratheres maximum ,1 majuscule , 1 chiffre' });
+        res.status(201).json({ message: 'Le mot de passe doit comporter 8 caratères maximum ,1 majuscule , 1 chiffre' });
     };
 };
 

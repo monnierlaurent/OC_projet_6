@@ -42,14 +42,14 @@ exports.displaySauce = (req, res, next) => {
     // methode find() pour récupération de toute les sauces  présente dans la BDD
     Sauce.find()
         .then(sauces => res.status(200).json(sauces))
-        .catch(() => res.status(404).json({ error: 'Sauces non trouvé' }));
+        .catch(() => res.status(404).json({ error: 'Sauces non trouvées' }));
 };
 
 // récupération d'une saul  sauce par son _ID 
 exports.displayIdSauce = (req, res, next) => {
     const id = sanitize(req.params.id);
     if (!id) {
-        res.status(404).json({ error: 'cette sauce n\'existe pas !' });
+        res.status(404).json({ error: 'Cette sauce n\'existe pas !' });
     };
 
     // methode findOne() our récupération d'une seul sauce dans la BDD par son id
@@ -105,7 +105,7 @@ exports.updateSauce = (req, res, next) => {
                     // si pas de fichier present mise a jour uniquement avec le corp de la requête
                     Sauce.updateOne({ _id: req.params.id }, {...sauceObject, _id: req.params.id })
                         .then(() => {
-                            res.status(200).json({ message: 'Sauce non modifié !', });
+                            res.status(200).json({ message: 'Sauce non modifiée !', });
                         })
                         .catch(() => {
                             res.status(400).json({ error: 'La syntaxe de la requête est erronée' })
@@ -113,7 +113,7 @@ exports.updateSauce = (req, res, next) => {
                 };
                 // response si l'utilisateur qui n'est pas le créateur veu modifier la sauce
             } else {
-                res.status(403).json({ error: 'Modification impossible ,vous n\'êtes pas sont créateur !' });
+                res.status(403).json({ error: 'Modification impossible ,vous n\'êtes pas son créateur !' });
             };
         }).catch(() => {
             res.status(400).json({ error: 'La syntaxe de la requête est erronée' })
@@ -132,11 +132,11 @@ exports.likeSauce = (req, res, next) => {
             if (req.body.like === 1) {
                 if (sauce.usersLiked.includes(req.body.userId), sauce.usersDisliked.includes(req.body.userId)) {
                     Sauce.updateOne({ _id: req.params.id }, { likes: 0 }, { usersLiked: req.body.userId })
-                        .then(() => res.status(201).json({ message: 'Vous avez déja disliker !' }))
+                        .then(() => res.status(201).json({ message: 'Vous avez déjà disliké !' }))
                         .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
                 } else if (sauce.usersLiked.includes(req.body.userId)) {
                     Sauce.updateOne({ _id: req.params.id }, { likes: 1 }, { usersLiked: req.body.userId })
-                        .then(() => res.status(201).json({ message: 'Vous avez déja liker !' }))
+                        .then(() => res.status(201).json({ message: 'Vous avez déjà liké !' }))
                         .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
                 } else {
                     Sauce.updateOne({ _id: req.params.id }, { $inc: { likes: 1 }, $addToSet: { usersLiked: req.body.userId } })
@@ -148,11 +148,11 @@ exports.likeSauce = (req, res, next) => {
             if (req.body.like === -1) {
                 if (sauce.usersDisliked.includes(req.body.userId), sauce.usersLiked.includes(req.body.userId)) {
                     Sauce.updateOne({ _id: req.params.id }, { dislikes: 0 }, { usersDisliked: req.body.userId })
-                        .then(() => res.status(201).json({ message: 'Vous avez déja liker !' }))
+                        .then(() => res.status(201).json({ message: 'Vous avez déjà liké !' }))
                         .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
                 } else if (sauce.usersDisliked.includes(req.body.userId)) {
                     Sauce.updateOne({ _id: req.params.id }, { dislikes: 1 }, { usersDisliked: req.body.userId })
-                        .then(() => res.status(201).json({ message: 'Vous avez déja disliker !' }))
+                        .then(() => res.status(201).json({ message: 'Vous avez déjà disliké !' }))
                         .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
                 } else {
                     Sauce.updateOne({ _id: req.params.id }, { $inc: { dislikes: 1 }, $addToSet: { usersDisliked: req.body.userId } })
@@ -193,12 +193,12 @@ exports.deleteSauce = (req, res, next) => {
 
                     // methode deleteOne() pour supprimer une sauce dans la BDD
                     Sauce.deleteOne({ _id: id })
-                        .then(() => res.status(200).json({ message: 'Sauce supprimé !' }))
+                        .then(() => res.status(200).json({ message: 'Sauce supprimée !' }))
                         .catch(() => res.status(400).json({ error: 'La syntaxe de la requête est erronée' }));
                 });
                 // response si l'utilisateur qui n'est pas le créateur veux supprimer la sauce
             } else {
-                res.status(403).json({ error: 'suppression impossible ,vous n\'êtes pas sont créateur !' });
+                res.status(403).json({ error: 'suppression impossible ,vous n\'êtes pas son créateur !' });
             };
         })
         .catch(() => {
