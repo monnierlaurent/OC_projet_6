@@ -4,7 +4,7 @@
 
 Cette API a été développée avec NodeJS, Express v4.17.1 et MongoDB
 
-## Prerequisites
+## Conditions préalables
 
 Vous aurez besoin de:
 
